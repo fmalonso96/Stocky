@@ -16,6 +16,7 @@ import com.example.stocky.login.LoginScreen
 import com.example.stocky.model.Routes.LoginScreen
 import com.example.stocky.model.Routes.HomeScreen
 import com.example.stocky.home.HomeScreen
+import com.example.stocky.login.LoginViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +26,7 @@ class MainActivity : ComponentActivity() {
                 Box(Modifier.fillMaxSize()) {
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = LoginScreen.route) {
-                        composable(LoginScreen.route) { LoginScreen(navController) }
+                        composable(LoginScreen.route) { LoginScreen(navController, LoginViewModel()) }
                         composable(HomeScreen.route) { HomeScreen(navController) }
                         //composable(Routes.StockScreen.route) {}
                     }

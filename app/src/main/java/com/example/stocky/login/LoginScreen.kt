@@ -32,9 +32,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,14 +54,14 @@ import com.example.stocky.ui.theme.Shapes
 private const val CLOSE_ICON = "Close Icon"
 
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(navController: NavHostController, loginViewModel: LoginViewModel) {
     Box(
         Modifier
             .fillMaxSize()
             .padding(24.dp)
     ) {
         Header(Modifier.align(Alignment.TopEnd))
-        Body(Modifier.align(Alignment.Center))
+        Body(Modifier.align(Alignment.Center), loginViewModel)
         Bottom(Modifier.align(Alignment.BottomCenter), navController)
     }
 }
@@ -78,22 +78,21 @@ fun Header(modifier: Modifier) {
 }
 
 @Composable
-fun Body(modifier: Modifier) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var isLoginEnabled by rememberSaveable { mutableStateOf(false) }
+fun Body(modifier: Modifier, loginViewModel: LoginViewModel) {
+
+    val email: String by loginViewModel.email.observeAsState(initial = "")
+    val password: String by loginViewModel.password.observeAsState(initial = "")
+    val isLoginEnabled: Boolean by loginViewModel.isLoginEnabled.observeAsState(initial = false)
 
     Column(modifier = modifier) {
         Logo(Modifier.align(Alignment.CenterHorizontally))
         Spacer(modifier = Modifier.size(16.dp))
         Email(email) {
-            email = it
-            isLoginEnabled = enableLogin(email, password)
+            loginViewModel.onLoginChanged(newEmail = it, newPassword = password)
         }
         Spacer(modifier = Modifier.size(16.dp))
-        Password(password) {
-            password = it
-            isLoginEnabled = enableLogin(email, password)
+        Password(password, loginViewModel) {
+            loginViewModel.onLoginChanged(newEmail = email, newPassword = it)
         }
         Spacer(modifier = Modifier.size(16.dp))
         ForgotPassword(Modifier.align(Alignment.End))
@@ -138,8 +137,10 @@ fun Email(email: String, onEmailChanged: (String) -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Password(password: String, onPasswordChanged: (String) -> Unit) {
-    var passwordVisibility by remember { mutableStateOf(false) }
+fun Password(password: String, loginViewModel: LoginViewModel, onPasswordChanged: (String) -> Unit) {
+
+    val passwordVisibility: Boolean by loginViewModel.passwordVisibility.observeAsState(initial = false)
+
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         value = password,
@@ -160,7 +161,7 @@ fun Password(password: String, onPasswordChanged: (String) -> Unit) {
             } else {
                 Icons.Filled.Visibility
             }
-            IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+            IconButton(onClick = { loginViewModel.onPasswordVisibilityChanged() }) {
                 Icon(imageVector = image, contentDescription = "Show Password")
             }
         },
@@ -265,13 +266,11 @@ fun SignUp(navController: NavHostController) {
         )
         Text(
             text = "Sign Up.",
-            Modifier.padding(horizontal = 8.dp).clickable { navController.navigate(HomeScreen.route) },
+            Modifier
+                .padding(horizontal = 8.dp)
+                .clickable { navController.navigate(HomeScreen.route) },
             color = Color.Blue,
             fontWeight = FontWeight.Bold
         )
     }
-}
-
-fun enableLogin(email: String, password: String): Boolean {
-    return Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.length >= 6
 }
