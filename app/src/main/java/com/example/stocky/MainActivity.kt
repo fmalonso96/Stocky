@@ -6,13 +6,16 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.stocky.ui.theme.StockyTheme
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.stocky.login.LoginScreen
+import com.example.stocky.model.Routes.LoginScreen
+import com.example.stocky.model.Routes.HomeScreen
+import com.example.stocky.home.HomeScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,7 +23,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             StockyTheme {
                 Box(Modifier.fillMaxSize()) {
-                    LoginScreen()
+                    val navController = rememberNavController()
+                    NavHost(navController = navController, startDestination = LoginScreen.route) {
+                        composable(LoginScreen.route) { LoginScreen(navController) }
+                        composable(HomeScreen.route) { HomeScreen(navController) }
+                        //composable(Routes.StockScreen.route) {}
+                    }
                 }
             }
         }

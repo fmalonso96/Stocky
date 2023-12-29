@@ -1,4 +1,4 @@
-package com.example.stocky
+package com.example.stocky.login
 
 import android.app.Activity
 import android.util.Patterns
@@ -47,12 +47,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.example.stocky.model.Routes.HomeScreen
 import com.example.stocky.ui.theme.Shapes
 
 private const val CLOSE_ICON = "Close Icon"
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavHostController) {
     Box(
         Modifier
             .fillMaxSize()
@@ -60,7 +62,7 @@ fun LoginScreen() {
     ) {
         Header(Modifier.align(Alignment.TopEnd))
         Body(Modifier.align(Alignment.Center))
-        Bottom(Modifier.align(Alignment.BottomCenter))
+        Bottom(Modifier.align(Alignment.BottomCenter), navController)
     }
 }
 
@@ -184,7 +186,7 @@ fun ForgotPassword(modifier: Modifier) {
 @Composable
 fun LoginButton(isLoginEnabled: Boolean) {
     Button(
-        onClick = { },
+        onClick = {  },
         modifier = Modifier.fillMaxWidth(),
         shape = Shapes.medium,
         enabled = isLoginEnabled,
@@ -240,7 +242,7 @@ fun SocialLogin() {
 }
 
 @Composable
-fun Bottom(modifier: Modifier) {
+fun Bottom(modifier: Modifier, navController: NavHostController) {
     Column(modifier = modifier.fillMaxWidth()) {
         Divider(
             Modifier
@@ -249,13 +251,13 @@ fun Bottom(modifier: Modifier) {
                 .background(Color.Gray)
         )
         Spacer(modifier = Modifier.size(24.dp))
-        SignUp()
+        SignUp(navController)
         Spacer(modifier = Modifier.size(24.dp))
     }
 }
 
 @Composable
-fun SignUp() {
+fun SignUp(navController: NavHostController) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         Text(
             text = "Don't have an account?",
@@ -263,7 +265,7 @@ fun SignUp() {
         )
         Text(
             text = "Sign Up.",
-            Modifier.padding(horizontal = 8.dp),
+            Modifier.padding(horizontal = 8.dp).clickable { navController.navigate(HomeScreen.route) },
             color = Color.Blue,
             fontWeight = FontWeight.Bold
         )
