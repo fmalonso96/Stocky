@@ -74,11 +74,6 @@ class MainActivity : ComponentActivity() {
 
                             LaunchedEffect(key1 = signInState.isSignInSuccessful) {
                                 if (signInState.isSignInSuccessful) {
-                                    Toast.makeText(
-                                        applicationContext,
-                                        "Signed in",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
                                     navController.navigate(HomeScreen.route)
                                     viewModel.resetSignInState()
                                 }
@@ -106,13 +101,10 @@ class MainActivity : ComponentActivity() {
                                 onSignOut = {
                                     lifecycleScope.launch {
                                         googleAuthClient.signOut()
-                                        Toast.makeText(
-                                            applicationContext,
-                                            "Signed Out",
-                                            Toast.LENGTH_LONG
-                                        ).show()
                                     }
-                                    navController.popBackStack()
+                                    navController.navigate(LoginScreen.route) {
+                                        popUpTo(LoginScreen.route) { inclusive = true }
+                                    }
                                 }
                             )
                         }
