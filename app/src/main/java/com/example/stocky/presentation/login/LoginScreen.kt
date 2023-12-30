@@ -1,8 +1,7 @@
-package com.example.stocky.login
+package com.example.stocky.presentation.login
 
 import android.app.Activity
-import android.util.Patterns
-import androidx.compose.foundation.Image
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,15 +30,12 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -47,22 +43,24 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import com.example.stocky.model.Routes.HomeScreen
 import com.example.stocky.ui.theme.Shapes
 
 private const val CLOSE_ICON = "Close Icon"
 
 @Composable
-fun LoginScreen(navController: NavHostController, loginViewModel: LoginViewModel) {
+fun LoginScreen(
+    loginViewModel: LoginViewModel,
+    signInState: SignInState,
+    onSignInClick: () -> Unit
+) {
     Box(
         Modifier
             .fillMaxSize()
             .padding(24.dp)
     ) {
         Header(Modifier.align(Alignment.TopEnd))
-        Body(Modifier.align(Alignment.Center), loginViewModel)
-        Bottom(Modifier.align(Alignment.BottomCenter), navController)
+        Body(Modifier.align(Alignment.Center), loginViewModel, signInState, onSignInClick)
+        Bottom(Modifier.align(Alignment.BottomCenter))
     }
 }
 
@@ -78,7 +76,12 @@ fun Header(modifier: Modifier) {
 }
 
 @Composable
-fun Body(modifier: Modifier, loginViewModel: LoginViewModel) {
+fun Body(
+    modifier: Modifier,
+    loginViewModel: LoginViewModel,
+    signInState: SignInState,
+    onSignInClick: () -> Unit
+) {
 
     val email: String by loginViewModel.email.observeAsState(initial = "")
     val password: String by loginViewModel.password.observeAsState(initial = "")
@@ -101,7 +104,7 @@ fun Body(modifier: Modifier, loginViewModel: LoginViewModel) {
         Spacer(modifier = Modifier.size(16.dp))
         LoginDivider()
         Spacer(modifier = Modifier.size(16.dp))
-        SocialLogin()
+        SocialLogin(signInState, onSignInClick)
     }
 }
 
@@ -111,7 +114,7 @@ fun Logo(modifier: Modifier) {
         text = "STOCKY",
         fontSize = 32.sp,
         color = Color.Gray,
-        modifier = modifier
+        modifier = modifier.padding(bottom = 64.dp)
     )
 }
 
@@ -227,23 +230,40 @@ fun LoginDivider() {
 }
 
 @Composable
-fun SocialLogin() {
+fun SocialLogin(signInState: SignInState, onSignInClick: () -> Unit) {
+
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = signInState.signInError) {
+        signInState.signInError?.let { error ->
+            Toast.makeText(
+                context,
+                error,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-        Image(
-            imageVector = Icons.Default.Email,
-            contentDescription = "Google Login",
-            modifier = Modifier.padding(end = 16.dp),
-            colorFilter = ColorFilter.tint(Color.DarkGray)
-        )
-        Text(
-            text = "Iniciar con Google",
-            color = Color.Gray
-        )
+        Button(
+            onClick = onSignInClick,
+            shape = Shapes.medium
+        ) {
+            Icon(
+                imageVector = Icons.Default.Email,
+                contentDescription = "Google Login",
+                modifier = Modifier.padding(8.dp)
+            )
+            Text(
+                text = "Iniciar con Google",
+                modifier = Modifier.padding(8.dp)
+            )
+        }
     }
 }
 
 @Composable
-fun Bottom(modifier: Modifier, navController: NavHostController) {
+fun Bottom(modifier: Modifier) {
     Column(modifier = modifier.fillMaxWidth()) {
         Divider(
             Modifier
@@ -252,13 +272,13 @@ fun Bottom(modifier: Modifier, navController: NavHostController) {
                 .background(Color.Gray)
         )
         Spacer(modifier = Modifier.size(24.dp))
-        SignUp(navController)
+        SignUp()
         Spacer(modifier = Modifier.size(24.dp))
     }
 }
 
 @Composable
-fun SignUp(navController: NavHostController) {
+fun SignUp() {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         Text(
             text = "Don't have an account?",
@@ -267,8 +287,7 @@ fun SignUp(navController: NavHostController) {
         Text(
             text = "Sign Up.",
             Modifier
-                .padding(horizontal = 8.dp)
-                .clickable { navController.navigate(HomeScreen.route) },
+                .padding(horizontal = 8.dp),
             color = Color.Blue,
             fontWeight = FontWeight.Bold
         )
