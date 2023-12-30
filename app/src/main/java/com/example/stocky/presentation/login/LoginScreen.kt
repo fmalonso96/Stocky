@@ -111,7 +111,7 @@ fun Body(
 @Composable
 fun Logo(modifier: Modifier) {
     Text(
-        text = "STOCKY",
+        text = "Stocky",
         fontSize = 32.sp,
         color = Color.Gray,
         modifier = modifier.padding(bottom = 64.dp)
