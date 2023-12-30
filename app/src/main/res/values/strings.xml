@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Stocky</string>
+
+    <string name="firebase_google_web_client_id">199860739675-al114kbsma91ak0ip7ffo36dj1um6r1b.apps.googleusercontent.com</string>
 </resources>
