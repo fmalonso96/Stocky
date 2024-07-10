@@ -2,8 +2,10 @@ package com.example.stocky.presentation.login
 
 import android.app.Activity
 import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -51,7 +53,8 @@ private const val CLOSE_ICON = "Close Icon"
 fun LoginScreen(
     loginViewModel: LoginViewModel,
     signInState: SignInState,
-    onSignInClick: () -> Unit
+    onSignInClick: () -> Unit,
+    onLongPress: () -> Unit
 ) {
     Box(
         Modifier
@@ -60,7 +63,7 @@ fun LoginScreen(
     ) {
         Header(Modifier.align(Alignment.TopEnd))
         Body(Modifier.align(Alignment.Center), loginViewModel, signInState, onSignInClick)
-        Bottom(Modifier.align(Alignment.BottomCenter))
+        Bottom(Modifier.align(Alignment.BottomCenter), onLongPress)
     }
 }
 
@@ -190,15 +193,15 @@ fun ForgotPassword(modifier: Modifier) {
 @Composable
 fun LoginButton(isLoginEnabled: Boolean) {
     Button(
-        onClick = {  },
+        onClick = { },
         modifier = Modifier.fillMaxWidth(),
         shape = Shapes.medium,
         enabled = isLoginEnabled,
         colors = ButtonDefaults.buttonColors(
-             containerColor = Color.DarkGray,
-             contentColor = Color.White,
-             disabledContainerColor = Color.Gray,
-             disabledContentColor = Color.White
+            containerColor = Color.DarkGray,
+            contentColor = Color.White,
+            disabledContainerColor = Color.Gray,
+            disabledContentColor = Color.White
         )
     ) {
         Text(text = "Login")
@@ -263,7 +266,7 @@ fun SocialLogin(signInState: SignInState, onSignInClick: () -> Unit) {
 }
 
 @Composable
-fun Bottom(modifier: Modifier) {
+fun Bottom(modifier: Modifier, onLongPress: () -> Unit) {
     Column(modifier = modifier.fillMaxWidth()) {
         Divider(
             Modifier
@@ -272,13 +275,14 @@ fun Bottom(modifier: Modifier) {
                 .background(Color.Gray)
         )
         Spacer(modifier = Modifier.size(24.dp))
-        SignUp()
+        SignUp(onLongPress)
         Spacer(modifier = Modifier.size(24.dp))
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SignUp() {
+fun SignUp(onLongPress: () -> Unit) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         Text(
             text = "Don't have an account?",
@@ -287,7 +291,11 @@ fun SignUp() {
         Text(
             text = "Sign Up.",
             Modifier
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = 8.dp)
+                .combinedClickable(
+                    onClick = {},
+                    onLongClick = onLongPress
+                ),
             color = Color.Blue,
             fontWeight = FontWeight.Bold
         )

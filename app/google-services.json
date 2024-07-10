@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "199860739675",
+    "project_id": "stocky-f693b",
+    "storage_bucket": "stocky-f693b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:199860739675:android:7e5345d3ab8eaf4cdc297e",
+        "android_client_info": {
+          "package_name": "com.example.stocky"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "199860739675-15pq16g3ln2lm556ch58sf7ut9ec0osr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.stocky",
+            "certificate_hash": "64d9d8492b22bae43f0b3486ce6507cd2cc55b97"
+          }
+        },
+        {
+          "client_id": "199860739675-al114kbsma91ak0ip7ffo36dj1um6r1b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZ8CiNqsVv_fSG0lpaBHUpPlFMuSNlsXE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "199860739675-al114kbsma91ak0ip7ffo36dj1um6r1b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
