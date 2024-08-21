@@ -19,7 +19,7 @@ fun HomeScreen() {
             .fillMaxSize()
             .padding(horizontal = 18.dp)
     ) {
-        Spacer(modifier = Modifier.height(64.dp).fillMaxWidth())
+        Spacer(modifier = Modifier.height(60.dp).fillMaxWidth())
         Text(text = "Home Screen")
     }
 }

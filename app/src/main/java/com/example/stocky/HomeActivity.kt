@@ -42,17 +42,24 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.stocky.model.navigation.Routes
 import com.example.stocky.model.navigation.Routes.AddProductScreen
 import com.example.stocky.model.navigation.Routes.HomeScreen
 import com.example.stocky.model.navigation.Routes.ProductDetailScreen
+import com.example.stocky.model.navigation.Routes.ProductSelectionScreen
+import com.example.stocky.model.navigation.Routes.SalesScreen
+import com.example.stocky.model.navigation.Routes.AddSaleScreen
 import com.example.stocky.presentation.home.HomeScreen
 import com.example.stocky.presentation.products.ProductDetailScreen
+import com.example.stocky.presentation.sales.AddSaleScreen
+import com.example.stocky.presentation.sales.ProductSelectionScreen
+import com.example.stocky.presentation.sales.SalesScreen
 import com.example.stocky.presentation.products.ProductsScreen
 import com.example.stocky.presentation.products.AddProductScreen
 import com.example.stocky.model.navigation.Routes.ProductsScreen
 import com.example.stocky.presentation.home.DrawerNavigationItem
 import com.example.stocky.presentation.login.GoogleAuthClient
-import com.example.stocky.presentation.viewmodels.ProductsViewModel
+import com.example.stocky.presentation.viewmodels.SharedViewModel
 import com.example.stocky.ui.theme.StockyTheme
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.CoroutineScope
@@ -73,7 +80,7 @@ class HomeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
 
-            val viewModel: ProductsViewModel = viewModel()
+            val viewModel: SharedViewModel = viewModel()
 
             StockyTheme {
                 val context = LocalContext.current
@@ -109,6 +116,10 @@ class HomeActivity : ComponentActivity() {
                                             }
                                             DrawerNavigationItem.DrawerItemStorage.title -> {}
                                             DrawerNavigationItem.DrawerItemSettings.title -> {}
+                                            DrawerNavigationItem.DrawerItemSales.title -> {
+                                                navController.navigate(SalesScreen.route)
+                                                toolbarTitle = item.title
+                                            }
                                             DrawerNavigationItem.DrawerItemSignOut.title -> {
                                                 setSignOutNavigation(lifecycleScope, googleAuthClient, context, activity)
                                             }
@@ -144,20 +155,53 @@ class HomeActivity : ComponentActivity() {
                                 ProductsScreen(
                                     viewModel,
                                     onAddProductClicked = {
-                                        toolbarTitle = "Add Product"
+                                        toolbarTitle = "Agregar Producto"
                                         navController.navigate(AddProductScreen.route)
                                     },
                                     onProductClicked = {
-                                        toolbarTitle = "Product Detail"
+                                        toolbarTitle = "Detalle del Producto"
                                         navController.navigate(ProductDetailScreen.route)
                                     }
                                 )
                             }
                             composable(AddProductScreen.route) {
-                                AddProductScreen(viewModel)
+                                AddProductScreen(viewModel) {
+                                    toolbarTitle = "Agregar Producto"
+                                    navController.navigate(ProductsScreen.route)
+                                }
                             }
                             composable(ProductDetailScreen.route) {
-                                ProductDetailScreen(viewModel)
+                                ProductDetailScreen(viewModel) {
+                                    toolbarTitle = "Productos"
+                                    navController.navigate(ProductsScreen.route)
+                                }
+                            }
+                            composable(SalesScreen.route) {
+                                SalesScreen(
+                                    viewModel,
+                                    onAddSaleClicked = {
+                                        toolbarTitle = "Agregar Venta"
+                                        navController.navigate(AddSaleScreen.route)
+                                    }
+                                )
+                            }
+                            composable(AddSaleScreen.route) {
+                                AddSaleScreen(
+                                    viewModel,
+                                    onGoToProductSelection = {
+                                        toolbarTitle = "Selección de Productos"
+                                        navController.navigate(ProductSelectionScreen.route)
+                                    }
+                                )
+                            }
+                            composable(ProductSelectionScreen.route) {
+                                ProductSelectionScreen(
+                                    viewModel,
+                                    onConfirmationClicked = {
+                                        toolbarTitle = "Agregar Venta"
+                                        navController.navigate(AddSaleScreen.route)
+                                    }
+                                )
                             }
                         }
                     }
@@ -165,11 +209,13 @@ class HomeActivity : ComponentActivity() {
 
                 navController.addOnDestinationChangedListener { _, destination, _ ->
                     when (destination.route) {
-                        HomeScreen.route -> toolbarTitle = "Home"
-                        ProductsScreen.route -> toolbarTitle = "Products"
-                        AddProductScreen.route -> toolbarTitle = "Add Product"
-                        ProductDetailScreen.route -> toolbarTitle = "Product Detail"
-                        //ADD THE REST OF ROUTES ONCE CREATED TO CHANGE TOOLBAR TITLE ON BACK PRESSED
+                        HomeScreen.route -> toolbarTitle = "Inicio"
+                        ProductsScreen.route -> toolbarTitle = "Productos"
+                        AddProductScreen.route -> toolbarTitle = "Agregar Producto"
+                        ProductDetailScreen.route -> toolbarTitle = "Detalle del Producto"
+                        SalesScreen.route -> toolbarTitle = "Ventas"
+                        AddSaleScreen.route -> toolbarTitle = "Agregar Venta"
+                        ProductSelectionScreen.route -> toolbarTitle = "Selección de Productos"
                     }
                 }
             }
@@ -193,6 +239,7 @@ fun Toolbar(title: String, onMenuClicked: () -> Unit) {
 fun setupDrawerActivityItems(): List<DrawerNavigationItem> = listOf(
     DrawerNavigationItem.DrawerItemHome,
     DrawerNavigationItem.DrawerItemProducts,
+    DrawerNavigationItem.DrawerItemSales,
     DrawerNavigationItem.DrawerItemStorage,
     DrawerNavigationItem.DrawerItemSettings,
     DrawerNavigationItem.DrawerItemSignOut
@@ -204,7 +251,7 @@ private fun setSignOutNavigation(scope: CoroutineScope, auth: GoogleAuthClient, 
     }
     Toast.makeText(
         context,
-        "Signed Out",
+        "Sesion Cerrada",
         Toast.LENGTH_SHORT
     ).show()
     context.startActivity(Intent(context, MainActivity::class.java))
