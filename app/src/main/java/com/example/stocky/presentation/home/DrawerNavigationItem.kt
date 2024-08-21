@@ -1,11 +1,13 @@
 package com.example.stocky.presentation.home
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Output
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material.icons.filled.Storage
+import androidx.compose.material.icons.outlined.AttachMoney
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Output
 import androidx.compose.material.icons.outlined.Settings
@@ -19,28 +21,33 @@ sealed class DrawerNavigationItem(
     val unselectedIcon: ImageVector
 ) {
     object DrawerItemHome :DrawerNavigationItem(
-        title = "Home",
+        title = "Inicio",
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home
     )
     object DrawerItemStorage :DrawerNavigationItem(
-        title = "Storage",
+        title = "Stock",
         selectedIcon = Icons.Filled.Storage,
         unselectedIcon = Icons.Outlined.Storage
     )
     object DrawerItemSettings :DrawerNavigationItem(
-        title = "Settings",
+        title = "Configuracion",
         selectedIcon = Icons.Filled.Settings,
         unselectedIcon = Icons.Outlined.Settings
     )
     object DrawerItemSignOut :DrawerNavigationItem(
-        title = "Sign Out",
+        title = "Cerrar Sesion",
         selectedIcon = Icons.Filled.Output,
         unselectedIcon = Icons.Outlined.Output
     )
     object DrawerItemProducts :DrawerNavigationItem(
-        title = "Products",
+        title = "Productos",
         selectedIcon = Icons.Filled.ShoppingBasket,
         unselectedIcon = Icons.Outlined.ShoppingBasket
+    )
+    object DrawerItemSales :DrawerNavigationItem(
+        title = "Ventas",
+        selectedIcon = Icons.Filled.AttachMoney,
+        unselectedIcon = Icons.Outlined.AttachMoney
     )
 }

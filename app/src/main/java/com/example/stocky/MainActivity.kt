@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
                     if (signInState.isSignInSuccessful) {
                         Toast.makeText(
                             context,
-                            "Signed In",
+                            "Sesion Iniciada",
                             Toast.LENGTH_SHORT
                         ).show()
                         context.startActivity(Intent(context, HomeActivity::class.java))
