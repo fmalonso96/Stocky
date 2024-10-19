@@ -42,7 +42,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.stocky.model.navigation.Routes
+import com.example.stocky.model.navigation.Routes.MetricsScreen
 import com.example.stocky.model.navigation.Routes.AddProductScreen
 import com.example.stocky.model.navigation.Routes.HomeScreen
 import com.example.stocky.model.navigation.Routes.ProductDetailScreen
@@ -59,6 +59,7 @@ import com.example.stocky.presentation.products.AddProductScreen
 import com.example.stocky.model.navigation.Routes.ProductsScreen
 import com.example.stocky.presentation.home.DrawerNavigationItem
 import com.example.stocky.presentation.login.GoogleAuthClient
+import com.example.stocky.presentation.metrics.MetricsScreen
 import com.example.stocky.presentation.viewmodels.SharedViewModel
 import com.example.stocky.ui.theme.StockyTheme
 import com.google.android.gms.auth.api.identity.Identity
@@ -122,6 +123,10 @@ class HomeActivity : ComponentActivity() {
                                             }
                                             DrawerNavigationItem.DrawerItemSignOut.title -> {
                                                 setSignOutNavigation(lifecycleScope, googleAuthClient, context, activity)
+                                            }
+                                            DrawerNavigationItem.DrawerItemMetrics.title -> {
+                                                navController.navigate(MetricsScreen.route)
+                                                toolbarTitle = item.title
                                             }
                                         }
                                         selectedItemIndex = index
@@ -203,6 +208,11 @@ class HomeActivity : ComponentActivity() {
                                     }
                                 )
                             }
+                            composable(MetricsScreen.route) {
+                                MetricsScreen(
+                                    viewModel
+                                )
+                            }
                         }
                     }
                 }
@@ -216,6 +226,7 @@ class HomeActivity : ComponentActivity() {
                         SalesScreen.route -> toolbarTitle = "Ventas"
                         AddSaleScreen.route -> toolbarTitle = "Agregar Venta"
                         ProductSelectionScreen.route -> toolbarTitle = "Selección de Productos"
+                        MetricsScreen.route -> toolbarTitle = "Metricas"
                     }
                 }
             }
@@ -240,6 +251,7 @@ fun setupDrawerActivityItems(): List<DrawerNavigationItem> = listOf(
     DrawerNavigationItem.DrawerItemHome,
     DrawerNavigationItem.DrawerItemProducts,
     DrawerNavigationItem.DrawerItemSales,
+    DrawerNavigationItem.DrawerItemMetrics,
     DrawerNavigationItem.DrawerItemStorage,
     DrawerNavigationItem.DrawerItemSettings,
     DrawerNavigationItem.DrawerItemSignOut

@@ -27,7 +27,7 @@ fun SalesScreen(
     onAddSaleClicked: () -> Unit
 ) {
 
-    val sales = viewModel.sales.observeAsState()
+    val sales = viewModel.salesOfTheDay.observeAsState()
     
     Box(modifier = Modifier.fillMaxSize().padding(8.dp)) {
         Text(
