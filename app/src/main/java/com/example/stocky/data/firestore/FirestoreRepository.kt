@@ -31,9 +31,24 @@ class FirestoreRepository {
             }
     }
 
-    fun getSales(callback: (List<Sale>) -> Unit) {
+    fun getSalesOfTheDay(callback: (List<Sale>) -> Unit) {
         db.collection(SALES)
             .whereEqualTo("date", today)
+            .get()
+            .addOnSuccessListener { result ->
+                val salesList = mutableListOf<Sale>()
+                for (document in result) {
+                    salesList.add(document.toObject<Sale>())
+                }
+                callback(salesList)
+            }
+            .addOnFailureListener { e ->
+                Log.w("Get Sales", "Error getting sales", e)
+            }
+    }
+
+    fun getSales(callback: (List<Sale>) -> Unit) {
+        db.collection(SALES)
             .get()
             .addOnSuccessListener { result ->
                 val salesList = mutableListOf<Sale>()

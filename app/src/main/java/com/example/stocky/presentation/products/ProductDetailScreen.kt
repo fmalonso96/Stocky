@@ -45,34 +45,6 @@ private const val SELECCIONAR_CATEGORIA = "Seleccionar Categoría"
 @Composable
 fun ProductDetailScreen(viewModel: SharedViewModel, onUpdateProduct: () -> Unit) {
 
-    /*Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 18.dp)
-    ) {
-        Spacer(modifier = Modifier
-            .height(60.dp)
-            .fillMaxWidth())
-        Text(text = "Product Detail Screen")
-        Box(modifier = Modifier.fillMaxSize()) {
-            Button(
-                onClick = {
-                    viewModel.updateProduct(
-                        Product(
-                            viewModel.currentProduct.id,
-                            "Raviolon",
-                            "8000",
-                            "Pastas"
-                        )
-                    )
-                },
-                modifier = Modifier.align(Alignment.BottomCenter)
-            ) {
-                Text(text = "Actualizar")
-            }
-        }
-    }*/
-
     val product = viewModel.currentProduct
     val category = remember { mutableStateOf(product.category) }
     val name = remember { mutableStateOf(product.name) }

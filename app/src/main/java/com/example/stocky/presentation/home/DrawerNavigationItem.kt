@@ -1,12 +1,14 @@
 package com.example.stocky.presentation.home
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Output
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material.icons.filled.Storage
+import androidx.compose.material.icons.outlined.Analytics
 import androidx.compose.material.icons.outlined.AttachMoney
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Output
@@ -49,5 +51,10 @@ sealed class DrawerNavigationItem(
         title = "Ventas",
         selectedIcon = Icons.Filled.AttachMoney,
         unselectedIcon = Icons.Outlined.AttachMoney
+    )
+    object DrawerItemMetrics :DrawerNavigationItem(
+        title = "Metricas",
+        selectedIcon = Icons.Filled.Analytics,
+        unselectedIcon = Icons.Outlined.Analytics
     )
 }
