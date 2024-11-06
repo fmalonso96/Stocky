@@ -116,22 +116,33 @@ class SharedViewModel : ViewModel() {
     }
 
     //cambiar la estructura de Map horrenda con una list de Pair.
-    fun setSaleMetricsMap() {
+    fun setSaleMetricsMap(startDate: Long?, endDate: Long?) {
+
+        val (start, end) = if (startDate == null || endDate == null) {
+            // Ajustar las fechas por defecto 1 semana hacia atras
+            val calendar = Calendar.getInstance()
+            calendar.add(Calendar.DAY_OF_YEAR, -1)
+            val defaultEndDate = calendar.timeInMillis
+
+            calendar.add(Calendar.DAY_OF_YEAR, -8)
+            val defaultStartDate = calendar.timeInMillis
+
+            Pair(defaultStartDate, defaultEndDate)
+        } else {
+            val calendar = Calendar.getInstance().apply {
+                timeInMillis = startDate
+                add(Calendar.DAY_OF_YEAR, -1)
+            }
+            val adjustedStartDate = calendar.timeInMillis
+            Pair(adjustedStartDate, endDate)
+        }
+
         val totalSales = sales.value.orEmpty()
-
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, -1)
-        val endDate = calendar.time
-
-        calendar.add(Calendar.DAY_OF_YEAR, -8)
-        val startDate = calendar.time
-
-        val formatter = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
 
         val filteredSales = totalSales.filter { sale ->
             try {
-                val saleDate = formatter.parse(sale.date)
-                saleDate != null && saleDate.after(startDate) && saleDate.before(endDate)
+                val saleDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).parse(sale.date)
+                saleDate != null && saleDate.time in (start..end)
             } catch (e: ParseException) {
                 false
             }
