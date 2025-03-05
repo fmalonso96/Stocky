@@ -63,6 +63,7 @@ import com.example.stocky.presentation.metrics.MetricsScreen
 import com.example.stocky.presentation.viewmodels.SharedViewModel
 import com.example.stocky.ui.theme.StockyTheme
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -75,6 +76,10 @@ class HomeActivity : ComponentActivity() {
             context = applicationContext,
             oneTapClient = Identity.getSignInClient(applicationContext)
         )
+    }
+
+    private val firebaseAuth by lazy {
+        FirebaseAuth.getInstance()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -122,7 +127,7 @@ class HomeActivity : ComponentActivity() {
                                                 toolbarTitle = item.title
                                             }
                                             DrawerNavigationItem.DrawerItemSignOut.title -> {
-                                                setSignOutNavigation(lifecycleScope, googleAuthClient, context, activity)
+                                                setSignOutNavigation(lifecycleScope, firebaseAuth, context, activity)
                                             }
                                             DrawerNavigationItem.DrawerItemMetrics.title -> {
                                                 navController.navigate(MetricsScreen.route)
@@ -257,15 +262,8 @@ fun setupDrawerActivityItems(): List<DrawerNavigationItem> = listOf(
     DrawerNavigationItem.DrawerItemSignOut
 )
 
-private fun setSignOutNavigation(scope: CoroutineScope, auth: GoogleAuthClient, context: Context, activity: Activity) {
-    scope.launch {
-        auth.signOut()
-    }
-    Toast.makeText(
-        context,
-        "Sesion Cerrada",
-        Toast.LENGTH_SHORT
-    ).show()
+private fun setSignOutNavigation(scope: CoroutineScope, fireAuth: FirebaseAuth, context: Context, activity: Activity) {
+    fireAuth.signOut()
     context.startActivity(Intent(context, MainActivity::class.java))
     activity.finish()
 }

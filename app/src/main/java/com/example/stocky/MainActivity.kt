@@ -9,11 +9,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.stocky.ui.theme.StockyTheme
@@ -21,6 +23,7 @@ import com.example.stocky.presentation.login.LoginScreen
 import com.example.stocky.presentation.login.GoogleAuthClient
 import com.example.stocky.presentation.login.LoginViewModel
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -32,9 +35,15 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    private val firebaseAuth by lazy {
+        FirebaseAuth.getInstance()
+    }
+
     @ExperimentalMaterial3Api
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
         setContent {
             StockyTheme {
                 val context = LocalContext.current
@@ -42,12 +51,29 @@ class MainActivity : ComponentActivity() {
 
                 val viewModel = viewModel<LoginViewModel>()
                 val signInState by viewModel.signInState.collectAsState()
+                val isUserLogged by viewModel.isUserLogged.collectAsState()
+                val foundUser = firebaseAuth.currentUser != null
 
-                LaunchedEffect(key1 = Unit) {
-                    if (googleAuthClient.getSignedInUser() != null) {
-                        context.startActivity(Intent(context, HomeActivity::class.java))
-                        activity.finish()
-                    }
+                //Common sign in.
+                val isLoginSuccessful by viewModel.isLoginSuccessful.collectAsState()
+                val loginError by viewModel.loginError.collectAsState()
+
+                splashScreen.setKeepOnScreenCondition { foundUser }
+
+                if (foundUser) {
+                    context.startActivity(Intent(context, HomeActivity::class.java))
+                    activity.finish()
+                }
+                if (isUserLogged) {
+                    viewModel.setLoading(false)
+                }
+
+                if (isLoginSuccessful) {
+                    context.startActivity(Intent(context, HomeActivity::class.java))
+                    viewModel.resetLoginState()
+                }
+                if (loginError != null) {
+                    viewModel.resetLoginError()
                 }
 
                 val launcher = rememberLauncherForActivityResult(
@@ -60,17 +86,14 @@ class MainActivity : ComponentActivity() {
                                 )
                                 viewModel.onSignInResult(signInResult)
                             }
+                        } else {
+                            viewModel.setLoading(false)
                         }
                     }
                 )
 
-                LaunchedEffect(key1 = signInState.isSignInSuccessful) {
-                    if (signInState.isSignInSuccessful) {
-                        Toast.makeText(
-                            context,
-                            "Sesion Iniciada",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                AnimatedVisibility(visible = signInState.isSignInSuccessful) {
+                    LaunchedEffect(key1 = Unit) {
                         context.startActivity(Intent(context, HomeActivity::class.java))
                         viewModel.resetSignInState()
                         activity.finish()
@@ -80,7 +103,12 @@ class MainActivity : ComponentActivity() {
                 LoginScreen(
                     viewModel,
                     signInState,
+                    onCommonSignIn = {
+                        viewModel.setLoading(true)
+                        viewModel.loginWithEmailAndPassword(firebaseAuth)
+                    },
                     onSignInClick = {
+                        viewModel.setLoading(true)
                         lifecycleScope.launch {
                             val signInIntentSender = googleAuthClient.signIn()
                             launcher.launch(
@@ -89,10 +117,6 @@ class MainActivity : ComponentActivity() {
                                 ).build()
                             )
                         }
-                    },
-                    onLongPress = {
-                        context.startActivity(Intent(context, HomeActivity::class.java))
-                        activity.finish()
                     }
                 )
             }

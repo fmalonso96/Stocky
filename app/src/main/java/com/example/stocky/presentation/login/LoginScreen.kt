@@ -1,6 +1,8 @@
 package com.example.stocky.presentation.login
 
 import android.app.Activity
+import android.content.Context
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -24,6 +26,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,18 +36,23 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.stocky.ui.theme.Shapes
 
 private const val CLOSE_ICON = "Close Icon"
@@ -53,17 +61,28 @@ private const val CLOSE_ICON = "Close Icon"
 fun LoginScreen(
     loginViewModel: LoginViewModel,
     signInState: SignInState,
-    onSignInClick: () -> Unit,
-    onLongPress: () -> Unit
+    onCommonSignIn: () -> Unit,
+    onSignInClick: () -> Unit
 ) {
+    val isLoading by loginViewModel.isLoading.collectAsState()
+    if (isLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Gray.copy(alpha = 0.5f))
+                .clickable(enabled = false, onClick = {})
+        ) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
+    }
     Box(
         Modifier
             .fillMaxSize()
             .padding(24.dp)
     ) {
         Header(Modifier.align(Alignment.TopEnd))
-        Body(Modifier.align(Alignment.Center), loginViewModel, signInState, onSignInClick)
-        Bottom(Modifier.align(Alignment.BottomCenter), onLongPress)
+        Body(Modifier.align(Alignment.Center), loginViewModel, signInState, onCommonSignIn, onSignInClick)
+        Bottom(Modifier.align(Alignment.BottomCenter))
     }
 }
 
@@ -83,12 +102,17 @@ fun Body(
     modifier: Modifier,
     loginViewModel: LoginViewModel,
     signInState: SignInState,
+    onCommonSignIn: () -> Unit,
     onSignInClick: () -> Unit
 ) {
 
     val email: String by loginViewModel.email.observeAsState(initial = "")
     val password: String by loginViewModel.password.observeAsState(initial = "")
     val isLoginEnabled: Boolean by loginViewModel.isLoginEnabled.observeAsState(initial = false)
+
+    if (signInState.signInError != null) {
+        Toast.makeText(LocalContext.current, signInState.signInError, Toast.LENGTH_SHORT).show()
+    }
 
     Column(modifier = modifier) {
         Logo(Modifier.align(Alignment.CenterHorizontally))
@@ -103,7 +127,7 @@ fun Body(
         Spacer(modifier = Modifier.size(16.dp))
         ForgotPassword(Modifier.align(Alignment.End))
         Spacer(modifier = Modifier.size(16.dp))
-        LoginButton(isLoginEnabled)
+        LoginButton(isLoginEnabled, onCommonSignIn)
         Spacer(modifier = Modifier.size(16.dp))
         LoginDivider()
         Spacer(modifier = Modifier.size(16.dp))
@@ -191,9 +215,9 @@ fun ForgotPassword(modifier: Modifier) {
 }
 
 @Composable
-fun LoginButton(isLoginEnabled: Boolean) {
+fun LoginButton(isLoginEnabled: Boolean, onCommonSignIn: () -> Unit) {
     Button(
-        onClick = { },
+        onClick = onCommonSignIn,
         modifier = Modifier.fillMaxWidth(),
         shape = Shapes.medium,
         enabled = isLoginEnabled,
@@ -266,7 +290,7 @@ fun SocialLogin(signInState: SignInState, onSignInClick: () -> Unit) {
 }
 
 @Composable
-fun Bottom(modifier: Modifier, onLongPress: () -> Unit) {
+fun Bottom(modifier: Modifier) {
     Column(modifier = modifier.fillMaxWidth()) {
         Divider(
             Modifier
@@ -275,14 +299,14 @@ fun Bottom(modifier: Modifier, onLongPress: () -> Unit) {
                 .background(Color.Gray)
         )
         Spacer(modifier = Modifier.size(24.dp))
-        SignUp(onLongPress)
+        SignUp()
         Spacer(modifier = Modifier.size(24.dp))
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SignUp(onLongPress: () -> Unit) {
+fun SignUp() {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         Text(
             text = "Don't have an account?",
@@ -293,8 +317,7 @@ fun SignUp(onLongPress: () -> Unit) {
             Modifier
                 .padding(horizontal = 8.dp)
                 .combinedClickable(
-                    onClick = {},
-                    onLongClick = onLongPress
+                    onClick = {}
                 ),
             color = Color.Blue,
             fontWeight = FontWeight.Bold
